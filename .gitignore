@@ -175,3 +175,4 @@ cython_debug/
 
 # Custom
 res/input/
+res/output/

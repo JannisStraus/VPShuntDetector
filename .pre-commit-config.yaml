@@ -1,5 +1,3 @@
-# See https://gitlab.uk-essen.de/ship-ai/pre-commit-hooks for the newest version
-
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.11.2
