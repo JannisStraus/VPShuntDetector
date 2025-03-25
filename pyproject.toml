@@ -1,20 +1,21 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 
-requires = [ "setuptools", "wheel" ]
+requires = [ "setuptools==77", "wheel" ]
 
 [project]
 name = "vpshunt-detector"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-license = { file = "LICENSE" }
+license-files = [ "LICENSE" ]
 authors = [
   { name = "Jannis Straus", email = "jannis.straus@uk-essen.de" },
 ]
 requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 4 - Beta",
+  "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
   "Operating System :: MacOS",
   "Operating System :: Microsoft :: Windows",
   "Operating System :: POSIX :: Linux",
