@@ -6,7 +6,7 @@ requires = [ "setuptools>=78.0.2,<79", "wheel" ]
 [project]
 name = "vpshunt-detector"
 version = "0.1.0"
-description = ""
+description = "TODO"
 readme = "README.md"
 license-files = [ "LICENSE" ]
 authors = [
@@ -36,6 +36,8 @@ dependencies = [
 optional-dependencies.dev = [
   "pre-commit>=4.2,<5",
 ]
+
+scripts.vpshuntdetector = "vpshuntdetector.__main__:main"
 
 [tool.ruff]
 target-version = "py310"
