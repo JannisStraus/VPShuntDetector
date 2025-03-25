@@ -20,7 +20,7 @@ cd VPShuntDetector
 pip install -e .
 ```
 
-## Uage
+## Usage
 
 After installation, you can run the tool directly from the command line:
 
