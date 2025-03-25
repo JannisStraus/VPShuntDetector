@@ -1,6 +1,6 @@
 # VPShuntDetector
 
-VPShuntDetector is a Python project designed to detect various VPShunt valves from medical images. The tool supports several valve types including:
+VPShuntDetector is a Python project designed to detect various VPShunt valves from X-ray images. The tool supports several valve types including:
 
 - Codman Certas
 - Codman Hakim
@@ -31,14 +31,15 @@ vpshuntdetector -i <input> -o <output>
 ## Command Line Arguments
 - `-i`, `--input`: **(Required)** Path to the input image or directory.
 - `-o`, `--output`: **(Required)** Path where the output results will be saved.
-- `-r`, `--reference-images`: _(Optional)_ Path to the directory containing reference images for manufacturer-specific settings.
+- `--instructions`: _(Optional)_ Directory with instruction images for valve models.
 - `-d`, `--device`: _(Optional)_ Device to perform inference on (e.g. `cuda` or `cpu`).
 
 ## Reference Images Folder Structure
 
-When using the `-r` or `--reference-images` option, the provided folder should contain one PNG image for each supported valve type. The image files must be named exactly as the valve type with a `.png` or `.jpg` extension. For example, the folder should include the following files:
+When using the `--instructions` option, the provided folder should contain one PNG image for each supported valve type. The image files must be named exactly as the valve type with a `.png` or `.jpg` extension. For example, the folder should include the following files:
+
 ```
-reference-images/
+example_instructions/
 ├── Codman Certas.png
 ├── Codman Hakim.png
 ├── Codman Uni-Shunt.png
