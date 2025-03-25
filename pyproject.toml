@@ -8,7 +8,7 @@ name = "vpshuntdetector"
 version = "0.1.0"
 description = ""
 readme = "README.md"
-license = { file = "LICENSE" }
+license = { "text" = "AGPL-3.0" }
 authors = [
   { name = "Jannis Straus", email = "jannis.straus@uk-essen.de" },
 ]
