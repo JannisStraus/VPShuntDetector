@@ -10,12 +10,6 @@ VPShuntDetector is a Python project designed to detect various VPShunt valves fr
 - proGAV
 - proSA
 
-## Features
-
-- **Valve Detection:** Identify multiple types of VPShunt valves from input images.
-- **Command-Line Interface:** Easily run the detector using a simple CLI.
-- **Flexible Inference:** Option to specify device (CPU, GPU, etc.) and reference images for manufacturer-specific adjustments.
-
 ## Installation
 
 Clone the repository and install the package in editable mode:
