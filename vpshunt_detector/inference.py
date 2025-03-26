@@ -53,11 +53,11 @@ def draw_bbox(
     image_path: str | Path,
     bbox: tuple[int, int, int, int],
     cls: str,
-    manufacturer_dir: str | Path | None = None,
-    missing_manufacturer: set[str] | None = None,
+    instruction_dir: str | Path | None = None,
+    missing_instructions: set[str] | None = None,
 ) -> MatLike:
-    if missing_manufacturer is None:
-        missing_manufacturer = set()
+    if missing_instructions is None:
+        missing_instructions = set()
     p1, p2 = bbox[:2], bbox[2:]
     img = cv2.imread(str(image_path))
     img = cv2.rectangle(img, p1, p2, color=(0, 255, 0), thickness=4)
@@ -70,9 +70,9 @@ def draw_bbox(
         (0, 255, 0),
         thickness=4,
     )
-    if manufacturer_dir:
-        manufacturer_dir = Path(manufacturer_dir)
-        manufacturer_path = next(manufacturer_dir.glob(f"{cls}.*"), None)
+    if instruction_dir:
+        instruction_dir = Path(instruction_dir)
+        manufacturer_path = next(instruction_dir.glob(f"{cls}.*"), None)
         if manufacturer_path:
             manufacturer_img = cv2.imread(str(manufacturer_path))
             manufacturer_img = cv2.resize(
@@ -87,10 +87,10 @@ def draw_bbox(
                 ),
             )
             img = cv2.hconcat([img, manufacturer_img])
-        elif cls not in missing_manufacturer:
-            missing_manufacturer.add(cls)
+        elif cls not in missing_instructions:
+            missing_instructions.add(cls)
             print(
-                f"Manufacturer image '{cls}.png' or '{cls}.jpg' is missing in '{manufacturer_dir}'."
+                f"Manufacturer image '{cls}.png' or '{cls}.jpg' is missing in '{instruction_dir}'."
             )
     return img
 
@@ -98,7 +98,7 @@ def draw_bbox(
 def infer(
     input_file_or_dir: str | Path | list[str | Path],
     output_dir: str | Path,
-    manufacturer_dir: str | Path | None = None,
+    instruction_dir: str | Path | None = None,
     device: str | None = None,
 ) -> None:
     weights_dir = download_and_unzip()
@@ -126,8 +126,8 @@ def infer(
             image_path,
             bbox,
             str(current_dict["prediction"]),
-            manufacturer_dir=manufacturer_dir,
-            missing_manufacturer=missing_manufacturer,
+            instruction_dir=instruction_dir,
+            missing_instructions=missing_manufacturer,
         )
         cv2.imwrite(str(output_dir / image_path.name), img)
 

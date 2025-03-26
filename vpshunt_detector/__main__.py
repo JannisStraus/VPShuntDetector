@@ -27,7 +27,7 @@ def main() -> None:
     infer(
         args.input,
         args.output,
-        manufacturer_dir=args.instructions,
+        instruction_dir=args.instructions,
         device=args.device,
     )
 
