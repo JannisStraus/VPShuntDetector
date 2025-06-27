@@ -40,7 +40,7 @@ def measure_results(
                 tmp_bbox = [round(i) for i in tmp_bbox]
                 pred_cls = models[i].names[tmp_cls]
                 pred_conf = tmp_conf
-                pred_bbox = tmp_bbox
+                pred_bbox = tuple(tmp_bbox[:4])
         confidence_accumulator[pred_cls] += pred_conf
         result_dict[f"prediction_fold_{i}"] = pred_cls
         result_dict[f"confidence_fold_{i}"] = pred_conf
@@ -86,9 +86,7 @@ def draw_bbox(
             manufacturer_img,
             (
                 int(
-                    manufacturer_img.shape[1]
-                    * img.shape[0]
-                    / manufacturer_img.shape[0]
+                    manufacturer_img.shape[1] * img.shape[0] / manufacturer_img.shape[0]
                 ),
                 img.shape[0],
             ),
