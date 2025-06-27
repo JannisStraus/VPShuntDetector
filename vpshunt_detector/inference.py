@@ -9,6 +9,11 @@ from ultralytics import YOLO
 
 from vpshunt_detector.download import download_and_unzip
 
+ALLOWED_FORMAT = {
+    ".png",
+    ".jpg",
+}
+
 
 def measure_results(
     weights_dir: Path, image: str | Path, device: str | None = None
@@ -70,28 +75,30 @@ def draw_bbox(
         (0, 255, 0),
         thickness=4,
     )
-    if instruction_dir:
-        instruction_dir = Path(instruction_dir)
-        manufacturer_path = next(instruction_dir.glob(f"{cls}.*"), None)
-        if manufacturer_path:
-            manufacturer_img = cv2.imread(str(manufacturer_path))
-            manufacturer_img = cv2.resize(
-                manufacturer_img,
-                (
-                    int(
-                        manufacturer_img.shape[1]
-                        * img.shape[0]
-                        / manufacturer_img.shape[0]
-                    ),
-                    img.shape[0],
+    if not instruction_dir:
+        return img
+
+    instruction_dir = Path(instruction_dir)
+    manufacturer_path = next(instruction_dir.glob(f"{cls}.*"), None)
+    if manufacturer_path:
+        manufacturer_img = cv2.imread(str(manufacturer_path))
+        manufacturer_img = cv2.resize(
+            manufacturer_img,
+            (
+                int(
+                    manufacturer_img.shape[1]
+                    * img.shape[0]
+                    / manufacturer_img.shape[0]
                 ),
-            )
-            img = cv2.hconcat([img, manufacturer_img])
-        elif cls not in missing_instructions:
-            missing_instructions.add(cls)
-            print(
-                f"Manufacturer image '{cls}.png' or '{cls}.jpg' is missing in '{instruction_dir}'."
-            )
+                img.shape[0],
+            ),
+        )
+        img = cv2.hconcat([img, manufacturer_img])
+    elif cls not in missing_instructions:
+        missing_instructions.add(cls)
+        print(
+            f"Manufacturer image '{cls}.png' or '{cls}.jpg' is missing in '{instruction_dir}'."
+        )
     return img
 
 
@@ -104,7 +111,7 @@ def infer(
     weights_dir = download_and_unzip()
     output_dir = Path(output_dir)
     result_dict: dict[str, list[str | float]] = defaultdict(list)
-    missing_manufacturer: set[str] = set()
+    missing_instructions: set[str] = set()
     if isinstance(input_file_or_dir, (str, Path)):
         input_file_or_dir = Path(input_file_or_dir)
         if input_file_or_dir.is_file():
@@ -112,9 +119,9 @@ def infer(
         else:
             input_file_or_dir = list(input_file_or_dir.iterdir())
 
-    for p in tqdm(input_file_or_dir):
+    for p in tqdm(input_file_or_dir, desc="Prediction"):
         image_path = Path(p)
-        if not image_path.is_file():
+        if not image_path.is_file() or image_path.suffix.lower() not in ALLOWED_FORMAT:
             continue
         result_dict["image_name"].append(image_path.name)
         current_dict, bbox = measure_results(weights_dir, image_path, device)
@@ -127,7 +134,7 @@ def infer(
             bbox,
             str(current_dict["prediction"]),
             instruction_dir=instruction_dir,
-            missing_instructions=missing_manufacturer,
+            missing_instructions=missing_instructions,
         )
         cv2.imwrite(str(output_dir / image_path.name), img)
 
