@@ -78,7 +78,8 @@ example_instructions/
 
 ## Output Details
 
-In the output directory specified by the -o option, VPShuntDetector generates:
+In the output directory specified by the `-o` or `--output` option,
+VPShuntDetector generates:
 
 - **results.csv:** A CSV file containing, for every input image, the predicted
 label and its confidence score for each of the 5 folds. This file also includes
@@ -86,5 +87,5 @@ the final aggregated confidence and prediction.
 - **Output Images:** For every input image, an output image is saved with a
 bounding box overlay that highlights the predicted valve model.
 - **Instruction Display:** If an instruction directory is provided via
---instructions, the corresponding instruction image for the predicted valve
+`--instructions`, the corresponding instruction image for the predicted valve
 model will be displayed alongside the output image.
