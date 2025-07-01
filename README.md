@@ -42,7 +42,7 @@ vpshuntdetector -i <input> -o <output>
 ```
 
 If you have a directory with instruction images, include it using the
---instructions flag (see [Instruction Images](#instruction-images) for more
+`--instructions` flag (see [Instruction Images](#instruction-images) for more
 details):
 
 ```bash
