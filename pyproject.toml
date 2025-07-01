@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 
-requires = [ "setuptools>=78.0.2,<79", "wheel" ]
+requires = [ "setuptools>=78.0.2", "wheel" ]
 
 [project]
 name = "vpshunt-detector"
@@ -12,7 +12,7 @@ license-files = [ "LICENSE" ]
 authors = [
   { name = "Jannis Straus", email = "jannis.straus@uk-essen.de" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4"
 classifiers = [
   "Development Status :: 4 - Beta",
   "Operating System :: MacOS",
@@ -27,14 +27,15 @@ classifiers = [
 dependencies = [
   "opencv-python>=4.11.0.86,<4.12",
   "pandas>=2.2.3,<3",
-  "pillow>=11.1,<12",
   "requests>=2.32.3,<3",
   "tqdm>=4.67.1,<5",
   "ultralytics>=8.3.69,<8.4",
 ]
 
 optional-dependencies.dev = [
+  "poetry-plugin-export>=1.9,<2",
   "pre-commit>=4.2,<5",
+  "pytest>=8.4.1,<9",
 ]
 
 scripts.vpshuntdetector = "vpshunt_detector.__main__:main"
