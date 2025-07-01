@@ -1,7 +1,7 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 
-requires = [ "setuptools>=78.0.2,<79", "wheel" ]
+requires = [ "setuptools>=78.0.2", "wheel" ]
 
 [project]
 name = "vpshunt-detector"
@@ -12,7 +12,7 @@ license-files = [ "LICENSE" ]
 authors = [
   { name = "Jannis Straus", email = "jannis.straus@uk-essen.de" },
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4"
 classifiers = [
   "Development Status :: 4 - Beta",
   "Operating System :: MacOS",
@@ -25,6 +25,7 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
 ]
 dependencies = [
+  "numpy>=2,<3",
   "opencv-python>=4.11.0.86,<4.12",
   "pandas>=2.2.3,<3",
   "pillow>=11.1,<12",
