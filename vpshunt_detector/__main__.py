@@ -46,7 +46,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    args.output.mkdir(parents=True, exists_ok=True)
+    args.output.mkdir(parents=True, exist_ok=True)
     infer(
         args.input,
         args.output,
