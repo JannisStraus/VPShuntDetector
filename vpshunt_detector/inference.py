@@ -117,6 +117,7 @@ def infer(
 ) -> None:
     weights_dir = download_and_unzip()
     models = load_models(weights_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
     result_dict: dict[str, list[str | float]] = defaultdict(list)
     missing_instructions: set[str] = set()
 

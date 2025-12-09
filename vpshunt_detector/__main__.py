@@ -1,4 +1,5 @@
 import argparse
+import logging
 from pathlib import Path
 
 from vpshunt_detector.inference import infer
@@ -46,7 +47,6 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    args.output.mkdir(parents=True, exist_ok=True)
     infer(
         args.input,
         args.output,
@@ -56,4 +56,5 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
