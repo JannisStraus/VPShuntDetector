@@ -5,14 +5,14 @@ requires = [ "setuptools>=78.0.2", "wheel" ]
 
 [project]
 name = "vpshunt-detector"
-version = "0.1.0"
+version = "0.1.1"
 description = "Detect VPShunt valves in X-ray images."
 readme = "README.md"
 license-files = [ "LICENSE" ]
 authors = [
   { name = "Jannis Straus", email = "jannis.straus@uk-essen.de" },
 ]
-requires-python = ">=3.10,<4"
+requires-python = ">=3.10,<3.14"
 classifiers = [
   "Development Status :: 4 - Beta",
   "Operating System :: MacOS",
@@ -29,16 +29,16 @@ dependencies = [
   "pandas>=2.2.3,<3",
   "requests>=2.32.3,<3",
   "tqdm>=4.67.1,<5",
-  "ultralytics>=8.3.69,<8.4",
-]
-
-optional-dependencies.dev = [
-  "poetry-plugin-export>=1.9,<2",
-  "pre-commit>=4.2,<5",
-  "pytest>=8.4.1,<9",
+  "ultralytics>=8.3.235,<8.4",
 ]
 
 scripts.vpshuntdetector = "vpshunt_detector.__main__:main"
+
+[dependency-groups]
+dev = [
+  "pre-commit>=4.5",
+  "pytest>=9.0.2",
+]
 
 [tool.setuptools]
 packages = { find = { where = [ "." ], include = [ "vpshunt_detector" ] } }
@@ -49,9 +49,8 @@ target-version = "py310"
 # Same as Black
 line-length = 88
 lint.select = [
-  "B", # flake8-bugbear
-  "C", # flake8-comprehensions
-  # "D",    # pydocstyle
+  "B",    # flake8-bugbear
+  "C",    # flake8-comprehensions
   "D401", # First line of docstring should be in imperative mood
   "E",    # pycodestyle errors
   "EXE",  # flake8-executable
