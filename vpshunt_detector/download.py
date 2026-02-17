@@ -26,6 +26,7 @@ def download(token: str, zip_file: str | Path) -> None:
     url = f"https://cloud.uk-essen.de/d/{token}/files/"
     params = {"p": f"/{zip_file.name}", "dl": "1"}
     response = requests.get(url, params=params, stream=True)
+    print(response.url)
     response.raise_for_status()
     total_size = int(response.headers.get("content-length", 0))
 

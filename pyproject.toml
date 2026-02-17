@@ -31,17 +31,15 @@ dependencies = [
   "ultralytics>=8.3.235,<8.4",
 ]
 
-scripts.vpshuntdetector = "vpshunt_detector.__main__:main"
+scripts.vpshuntdetector = "vpshunt_detector.main:main"
 
 [dependency-groups]
 dev = [
   "pre-commit>=4.5",
   "pytest>=9.0.2",
+  "pytest-cov>=7",
   "python-dotenv>=1.2.1",
 ]
-
-[tool.setuptools]
-packages = { find = { where = [ "." ], include = [ "vpshunt_detector" ] } }
 
 [tool.ruff]
 target-version = "py312"
@@ -72,6 +70,13 @@ lint.unfixable = [
   "F401", # Do not fix unused imports, it's annoying during development
 ]
 lint.pydocstyle.convention = "google"
+
+[tool.coverage.run]
+branch = true
+source = [ "vpshunt_detector" ]
+omit = [
+  "vpshunt_detector/main.py", # Tested in "CLI smoke test" workflow
+]
 
 [tool.mypy]
 # Ensure full coverage

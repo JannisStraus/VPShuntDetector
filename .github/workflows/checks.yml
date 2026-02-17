@@ -21,22 +21,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - run: |
-          echo "HOME=$HOME"
-          echo "USER=$USER"
-          uname -m
-          echo "RUNNER_ARCH=$RUNNER_ARCH"
-
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-
-      # - name: Set up Python ${{ matrix.python-version }}
-      #   uses: actions/setup-python@v5
-      #   with:
-      #     python-version: ${{ matrix.python-version }}
 
       - name: Install Python ${{ matrix.python-version }} via uv
         run: uv python install ${{ matrix.python-version }}
@@ -53,5 +42,30 @@ jobs:
       - name: Run pre-commit
         run: uv run pre-commit run -a --show-diff-on-failure
 
-      - name: Run pytest
-        run: uv run pytest ./tests
+      - name: Run pytest with coverage
+        run: uv run pytest --cov=vpshunt_detector --cov-report=term-missing --cov-report=xml
+
+      - name: CLI smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          # Download examples zip from Seafile share
+          curl -fL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples&dl=1" -o examples.zip
+
+          # Extract into ./examples (create folder even if zip has no parent dir)
+          rm -rf examples
+          mkdir -p examples
+          unzip -q examples.zip -d examples
+
+          # Run CLI via uv so it uses the venv
+          uv run vpshuntdetector \
+            -i examples/input \
+            -o examples/output \
+            --instructions examples/manufacturer \
+            -d "${DEVICE:-cpu}"
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: coverage.xml

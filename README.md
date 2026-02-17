@@ -1,5 +1,7 @@
 # VPShuntDetector
 
+![Coverage](https://codecov.io/gh/JannisStraus/VPShuntDetector/branch/main/graph/badge.svg)
+
 VPShuntDetector is a Python project designed to detect various VPShunt valves
 from X-ray images. The tool supports several valve types including:
 
