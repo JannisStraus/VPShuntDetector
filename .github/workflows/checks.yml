@@ -47,14 +47,14 @@ jobs:
           TMP_DIR="$(mktemp -d)"
           ZIP_PATH="$TMP_DIR/examples.zip"
 
-          curl -fL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples.zip&dl=1" -o "$ZIP_PATH"
+          curl -fsSL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples.zip&dl=1" -o "$ZIP_PATH"
           unzip -q "$ZIP_PATH" -d "$TMP_DIR"
 
           uv run vpshuntdetector \
-            -i "$TMP_DIR/examples/input" \
-            -o "$TMP_DIR/examples/output" \
-            --instructions "$TMP_DIR/examples/manufacturer" \
-            -d "${DEVICE:-cpu}"
+          -i "$TMP_DIR/input" \
+          -o "$TMP_DIR/output" \
+          --instructions "$TMP_DIR/manufacturer" \
+          -d "${DEVICE:-cpu}"
 
           rm -rf "$TMP_DIR"
 
