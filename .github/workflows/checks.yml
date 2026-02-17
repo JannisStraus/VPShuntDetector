@@ -36,7 +36,7 @@ jobs:
           key: precommit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync -q --dev
 
       - name: Run pre-commit
         run: uv run pre-commit run -a --show-diff-on-failure

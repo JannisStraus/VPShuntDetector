@@ -26,7 +26,6 @@ classifiers = [
 dependencies = [
   "opencv-python>=4.11.0.86,<4.12",
   "pandas>=2.2.3,<3",
-  "python-dotenv>=1.2.1",
   "requests>=2.32.3,<3",
   "tqdm>=4.67.1,<5",
   "ultralytics>=8.3.235,<8.4",
@@ -38,6 +37,7 @@ scripts.vpshuntdetector = "vpshunt_detector.__main__:main"
 dev = [
   "pre-commit>=4.5",
   "pytest>=9.0.2",
+  "python-dotenv>=1.2.1",
 ]
 
 [tool.setuptools]

@@ -1690,7 +1690,6 @@ source = { editable = "." }
 dependencies = [
     { name = "opencv-python" },
     { name = "pandas" },
-    { name = "python-dotenv" },
     { name = "requests" },
     { name = "tqdm" },
     { name = "ultralytics" },
@@ -1700,13 +1699,13 @@ dependencies = [
 dev = [
     { name = "pre-commit" },
     { name = "pytest" },
+    { name = "python-dotenv" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "opencv-python", specifier = ">=4.11.0.86,<4.12" },
     { name = "pandas", specifier = ">=2.2.3,<3" },
-    { name = "python-dotenv", specifier = ">=1.2.1" },
     { name = "requests", specifier = ">=2.32.3,<3" },
     { name = "tqdm", specifier = ">=4.67.1,<5" },
     { name = "ultralytics", specifier = ">=8.3.235,<8.4" },
@@ -1716,4 +1715,5 @@ requires-dist = [
 dev = [
     { name = "pre-commit", specifier = ">=4.5" },
     { name = "pytest", specifier = ">=9.0.2" },
+    { name = "python-dotenv", specifier = ">=1.2.1" },
 ]

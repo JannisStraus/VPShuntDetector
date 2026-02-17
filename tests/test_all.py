@@ -3,11 +3,15 @@ import shutil
 import unittest
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from vpshunt_detector.download import (
     download_and_unzip,
     get_cache_dir,
 )
 from vpshunt_detector.inference import infer
+
+load_dotenv()
 
 
 class Test(unittest.TestCase):
@@ -32,7 +36,11 @@ class Test(unittest.TestCase):
         test_device = os.getenv("DEVICE", "cpu")
 
         test_data_dir = download_and_unzip(test_token, test_data_dir)
+
+        # Test inference without instructions
         infer(test_input_dir, test_output_dir, device=test_device)
+
+        # Test inference with instructions
         infer(test_input_dir, test_output_dir, test_instructions_dir, test_device)
 
 

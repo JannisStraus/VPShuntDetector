@@ -150,7 +150,6 @@ python-dateutil==2.9.0.post0
     #   matplotlib
     #   pandas
 python-dotenv==1.2.1
-    # via vpshunt-detector
 pytz==2025.2
     # via pandas
 pyyaml==6.0.3
