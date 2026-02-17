@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
+      DEVICE: ${{ secrets.DEVICE }}
     strategy:
       fail-fast: false
       matrix:
