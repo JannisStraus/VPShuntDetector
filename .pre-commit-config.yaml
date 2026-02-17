@@ -1,16 +1,16 @@
 repos:
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.14.8
+    rev: v0.14.5
     hooks:
       - id: ruff
         args: [--fix]
       - id: ruff-format
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.0
+    rev: v1.18.2
     hooks:
       - id: mypy
-        language_version: python3.10
+        language_version: python3.12
         additional_dependencies: [types-requests]
 
   - repo: https://github.com/pre-commit/mirrors-prettier
@@ -21,13 +21,13 @@ repos:
         exclude: node_modules
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.11.1
+    rev: v2.5.1
     hooks:
       - id: pyproject-fmt
         types: [toml]
 
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.19.1
+    rev: v0.19.0
     hooks:
       - id: markdownlint-cli2
         args: [--fix]
@@ -40,9 +40,9 @@ repos:
 
   - repo: local
     hooks:
-      - id: export-uv-requirements
-        name: Create requirements.txt
-        entry: bash -c "uv export --no-hashes > requirements.txt"
+      - id: uv-export
+        name: uv-export
+        entry: uv export --format requirements-txt --no-hashes -o requirements.txt
         language: system
         pass_filenames: false
         always_run: true
