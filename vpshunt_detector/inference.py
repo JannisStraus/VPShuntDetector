@@ -7,7 +7,7 @@ import pandas as pd
 from tqdm import tqdm
 from ultralytics import YOLO
 
-from vpshunt_detector.download import download_and_unzip
+from vpshunt_detector.download import download_weights
 from vpshunt_detector.utils import BBox, save_bbox
 
 ALLOWED_FORMAT = {
@@ -115,7 +115,7 @@ def infer(
     instruction_dir: Path | None = None,
     device: str | None = None,
 ) -> None:
-    weights_dir = download_and_unzip()
+    weights_dir = download_weights()
     models = load_models(weights_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     result_dict: dict[str, list[str | float]] = defaultdict(list)
