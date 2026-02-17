@@ -30,12 +30,6 @@ jobs:
       - name: Install Python ${{ matrix.python-version }} via uv
         run: uv python install ${{ matrix.python-version }}
 
-      - name: Cache pre-commit environments
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit
-          key: precommit-${{ runner.os }}-${{ hashFiles('.pre-commit-config.yaml') }}
-
       - name: Install dependencies
         run: uv sync -q --dev
 
@@ -50,15 +44,12 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Download examples zip from Seafile share
           curl -fL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples&dl=1" -o examples.zip
 
-          # Extract into ./examples (create folder even if zip has no parent dir)
           rm -rf examples
           mkdir -p examples
           unzip -q examples.zip -d examples
 
-          # Run CLI via uv so it uses the venv
           uv run vpshuntdetector \
             -i examples/input \
             -o examples/output \
