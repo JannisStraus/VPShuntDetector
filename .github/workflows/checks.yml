@@ -44,17 +44,19 @@ jobs:
         run: |
           set -euo pipefail
 
-          curl -fL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples&dl=1" -o examples.zip
+          TMP_DIR="$(mktemp -d)"
+          ZIP_PATH="$TMP_DIR/examples.zip"
 
-          rm -rf examples
-          mkdir -p examples
-          unzip -q examples.zip -d examples
+          curl -fL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples.zip&dl=1" -o "$ZIP_PATH"
+          unzip -q "$ZIP_PATH" -d "$TMP_DIR"
 
           uv run vpshuntdetector \
-            -i examples/input \
-            -o examples/output \
-            --instructions examples/manufacturer \
+            -i "$TMP_DIR/examples/input" \
+            -o "$TMP_DIR/examples/output" \
+            --instructions "$TMP_DIR/examples/manufacturer" \
             -d "${DEVICE:-cpu}"
+
+          rm -rf "$TMP_DIR"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
