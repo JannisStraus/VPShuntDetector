@@ -21,7 +21,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      - run: echo "$RUNNER_TOOL_CACHE"
+      - run: |
+          echo "HOME=$HOME"
+          echo "USER=$USER"
+          uname -m
+          echo "RUNNER_ARCH=$RUNNER_ARCH"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v5
