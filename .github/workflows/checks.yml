@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted]
     env:
       CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
       DEVICE: ${{ secrets.DEVICE }}
