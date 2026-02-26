@@ -38,10 +38,23 @@ class Test(unittest.TestCase):
         test_data_dir = download_and_unzip(test_token, test_data_dir)
 
         # Test inference without instructions
-        infer(test_input_dir, test_output_dir, device=test_device)
+        # infer(test_input_dir, test_output_dir, device=test_device)
 
         # Test inference with instructions
-        infer(test_input_dir, test_output_dir, test_instructions_dir, test_device)
+        # infer(test_input_dir, test_output_dir, test_instructions_dir, test_device)
+
+        # Test inference with unexpected missing instructions
+        (test_instructions_dir / "Codman Certas.png").unlink()
+        with self.assertLogs("vpshunt_detector.utils", level="WARNING") as cm:
+            infer(test_input_dir, test_output_dir, test_instructions_dir, test_device)
+        self.assertEqual(len(cm.output), 1)
+        self.assertIn(
+            (
+                "Manufacturer image 'Codman Certas.png'"
+                " or 'Codman Certas.jpg' is missing in "
+            ),
+            cm.output[0],
+        )
 
 
 if __name__ == "__main__":

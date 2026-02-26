@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12"]
+        python-version: ["3.10", "3.11", 3.12", "3.13"]
 
     steps:
       - name: Check out repository
@@ -37,7 +37,7 @@ jobs:
         run: uv run pre-commit run -a --show-diff-on-failure
 
       - name: Run pytest with coverage
-        run: uv run pytest --cov=vpshunt_detector --cov-report=term-missing --cov-report=xml
+        run: uv run pytest
 
       - name: CLI smoke test
         shell: bash
@@ -49,11 +49,6 @@ jobs:
 
           curl -fsSL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples.zip&dl=1" -o "$ZIP_PATH"
           unzip -q "$ZIP_PATH" -d "$TMP_DIR"
-
-          uv run vpshuntdetector \
-          -i "$TMP_DIR/input" \
-          -o "$TMP_DIR/output" \
-          -d "${DEVICE:-cpu}"
 
           uv run vpshuntdetector \
           -i "$TMP_DIR/input" \

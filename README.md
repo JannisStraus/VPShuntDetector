@@ -1,5 +1,7 @@
 # VPShuntDetector
 
+![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
+![Checks](https://github.com/JannisStraus/VPShuntDetector/actions/workflows/checks.yml/badge.svg)
 ![Coverage](https://codecov.io/gh/JannisStraus/VPShuntDetector/branch/main/graph/badge.svg)
 
 VPShuntDetector is a Python project designed to detect various VPShunt valves

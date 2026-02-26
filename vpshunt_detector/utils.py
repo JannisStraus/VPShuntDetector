@@ -22,8 +22,8 @@ def save_bbox(
     cls: str,
     **kwargs: Any,
 ) -> None:
-    instruction_dir: str | Path | None = kwargs.get("instruction_dir", None)
-    missing_instructions: set[str] | None = kwargs.get("missing_instructions", None)
+    instruction_dir: str | Path | None = kwargs.get("instruction_dir")
+    missing_instructions: set[str] | None = kwargs.get("missing_instructions")
     img = draw_bbox(image_path, bbox, cls, instruction_dir, missing_instructions)
     cv2.imwrite(str(output_path), img)
 
