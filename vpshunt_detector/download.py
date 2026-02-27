@@ -14,7 +14,7 @@ def weights_exist(weights_dir: str | Path) -> bool:
 
 def unzip(zip_file: str | Path, output_dir: str | Path) -> None:
     zip_file = Path(zip_file)
-    with zipfile.ZipFile(zip_file, "r") as zip_ref:
+    with zipfile.ZipFile(zip_file, "r", metadata_encoding="utf-8") as zip_ref:
         zip_ref.extractall(output_dir)
 
 

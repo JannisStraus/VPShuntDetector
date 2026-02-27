@@ -85,7 +85,6 @@ run.branch = true
 run.omit = [
   "vpshunt_detector/main.py", # Tested in "CLI smoke test" workflow
 ]
-run.relative_files = true
 run.source = [ "vpshunt_detector" ]
 
 [tool.mypy]
