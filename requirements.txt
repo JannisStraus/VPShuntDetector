@@ -95,7 +95,7 @@ nvidia-nvjitlink-cu12==12.8.93 ; platform_machine == 'x86_64' and sys_platform =
     #   torch
 nvidia-nvshmem-cu12==3.4.5 ; platform_machine == 'x86_64' and sys_platform == 'linux'
     # via torch
-nvidia-nvtx-cu12==12.8.90 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-nvtx-cu12==12.9.79 ; platform_machine == 'x86_64' and sys_platform == 'linux'
     # via torch
 opencv-python==4.11.0.86
     # via
