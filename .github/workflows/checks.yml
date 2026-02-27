@@ -34,6 +34,8 @@ jobs:
         run: uv sync -q --dev
 
       - name: Run pre-commit
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: uv run pre-commit run -a --show-diff-on-failure
 
       - name: Run pytest with coverage
@@ -58,9 +60,9 @@ jobs:
 
           rm -rf "$TMP_DIR"
 
-      - name: Upload coverage to Codecov
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: codecov/codecov-action@v5
+      - name: Send coverage results
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
+        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de  # v5.5.2
         with:
           files: coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
