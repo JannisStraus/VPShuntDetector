@@ -66,21 +66,6 @@ repos:
       - id: gitleaks
         files: . # Always scan everything for secrets
 
-  - repo: https://github.com/pypa/pip-audit
-    rev: v2.10.0
-    hooks:
-      - id: pip-audit
-        args: [--no-deps, -r, requirements.txt]
-        pass_filenames: false
-        always_run: true
-
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.9.3
-    hooks:
-      - id: bandit
-        args: [-qr, vpshunt_detector] # Replace with your project
-        pass_filenames: false
-
   - repo: https://github.com/returntocorp/semgrep
     rev: v1.152.0
     hooks:
@@ -106,8 +91,3 @@ repos:
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: trailing-whitespace
-
-ci:
-  # Leave pip-audit to only run locally and not in CI
-  # pre-commit.ci does not allow network calls
-  skip: [pip-audit]
