@@ -85,7 +85,7 @@ nvidia-cusparse-cu12==12.5.8.93 ; platform_machine == 'x86_64' and sys_platform 
     #   torch
 nvidia-cusparselt-cu12==0.7.1 ; platform_machine == 'x86_64' and sys_platform == 'linux'
     # via torch
-nvidia-nccl-cu12==2.27.5 ; platform_machine == 'x86_64' and sys_platform == 'linux'
+nvidia-nccl-cu12==2.29.3 ; platform_machine == 'x86_64' and sys_platform == 'linux'
     # via torch
 nvidia-nvjitlink-cu12==12.8.93 ; platform_machine == 'x86_64' and sys_platform == 'linux'
     # via
