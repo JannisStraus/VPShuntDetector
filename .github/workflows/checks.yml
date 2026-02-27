@@ -66,3 +66,4 @@ jobs:
         with:
           files: coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
+          slug: JannisStraus/VPShuntDetector
