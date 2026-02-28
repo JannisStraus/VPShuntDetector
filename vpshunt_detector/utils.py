@@ -24,7 +24,13 @@ def save_bbox(
 ) -> None:
     instruction_dir: str | Path | None = kwargs.get("instruction_dir")
     missing_instructions: set[str] | None = kwargs.get("missing_instructions")
-    img = draw_bbox(image_path, bbox, cls, instruction_dir, missing_instructions)
+    img = draw_bbox(
+        image_path,
+        bbox,
+        cls,
+        instruction_dir,
+        missing_instructions=missing_instructions,
+    )
     cv2.imwrite(str(output_path), img)
 
 
@@ -33,10 +39,11 @@ def draw_bbox(
     bbox: BBox,
     cls: str,
     instruction_dir: str | Path | None = None,
+    *,
     missing_instructions: set[str] | None = None,
 ) -> MatLike:
     img = cv2.imread(str(image_path))
-    if not bbox:
+    if bbox is None:
         return img
     if missing_instructions is None:
         missing_instructions = set()
@@ -57,14 +64,14 @@ def draw_bbox(
     manufacturer_path = next(instruction_dir.glob(f"{cls}.*"), None)
     if manufacturer_path:
         manufacturer_img = cv2.imread(str(manufacturer_path))
+        scale = img.shape[0] / manufacturer_img.shape[0]
+        interpolation = cv2.INTER_AREA if scale < 1.0 else cv2.INTER_LINEAR
         manufacturer_img = cv2.resize(
             manufacturer_img,
-            (
-                int(
-                    manufacturer_img.shape[1] * img.shape[0] / manufacturer_img.shape[0]
-                ),
-                img.shape[0],
-            ),
+            None,
+            fx=scale,
+            fy=scale,
+            interpolation=interpolation,
         )
         img = cv2.hconcat([img, manufacturer_img])
     elif cls not in missing_instructions:
