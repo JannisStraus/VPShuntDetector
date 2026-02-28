@@ -13,6 +13,7 @@ from vpshunt_detector.utils import BBox, save_bbox
 ALLOWED_FORMAT = {
     ".png",
     ".jpg",
+    ".jpeg",
 }
 
 logger = logging.getLogger(__name__)
@@ -25,22 +26,6 @@ def load_models(weights_dir: Path, n_folds: int = 5) -> tuple[YOLO, ...]:
         YOLO(weights_dir / f"fold_{i}" / "best.pt", verbose=True)
         for i in range(n_folds)
     )
-
-
-# def _best_detection(result) -> tuple[int, float, BBox] | None:
-#     """
-#     Return the (class_id, confidence, bbox) of the highest-confidence detection
-#     in a single Ultralytics result object, or ``None`` if there is no detection.
-#     """
-#     boxes = result.boxes
-#     if boxes.cls.numel() == 0:  # no detections
-#         return None
-
-#     idx = int(boxes.conf.argmax())  # index of max-confidence box
-#     conf = float(boxes.conf[idx])
-#     cls_id = int(boxes.cls[idx])
-#     x1, y1, x2, y2 = boxes.xyxy[idx].round().int().tolist()[:4]
-#     return cls_id, conf, (x1, y1, x2, y2)
 
 
 def measure_results(
@@ -66,6 +51,8 @@ def measure_results(
                 pred_cls = model.names[tmp_cls]
                 pred_conf = tmp_conf
                 pred_bbox = tuple(tmp_bbox[:4])
+            else:
+                print(image_path)
         confidence_accumulator[pred_cls] += pred_conf
         result_dict[f"prediction_fold_{i}"] = pred_cls
         result_dict[f"confidence_fold_{i}"] = pred_conf
@@ -79,42 +66,14 @@ def measure_results(
     return result_dict, bbox_dict[final_prediction][0]
 
 
-# TODO
-# def measure_results(
-#     models: tuple[YOLO, ...], image_path: str | Path, device: str | None = None
-# ) -> tuple[dict[str, str | float], BBox]:
-#     confidence_totals: DefaultDict[str, float] = defaultdict(float)
-#     result_dict: dict[str, str | float] = {}
-#     best_bbox: dict[str, tuple[BBox, float]] = {}
-#     for fold_idx, model in enumerate(models):
-#         result = model(image_path, verbose=False, device=device)[0]
-#         detection = _best_detection(result)
-#         if detection is None:
-#             cls_name, conf, bbox = "Nothing", 0.0, None
-#         else:
-#             cls_idx, conf, bbox = detection
-#             cls_name = model.names[cls_idx]
-
-#         # accumulate
-#         confidence_totals[cls_name] += conf
-#         if cls_name not in best_bbox or conf > best_bbox[cls_name][1]:
-#             best_bbox[cls_name] = (bbox, conf)
-
-#         result_dict[f"prediction_fold_{fold_idx}"] = cls_name
-#         result_dict[f"confidence_fold_{fold_idx}"] = conf
-#     final_cls = max(confidence_totals, key=confidence_totals.__getitem__)
-#     final_conf = confidence_totals[final_cls] / len(models)
-
-#     result_dict.update(prediction=final_cls, confidence=final_conf)
-#     return result_dict, best_bbox[final_cls][0]
-
-
 def infer(
-    input_file_or_dir: Path,
-    output_dir: Path,
+    input_file_or_dir: str | Path,
+    output_dir: str | Path,
     instruction_dir: Path | None = None,
     device: str | None = None,
 ) -> None:
+    input_file_or_dir = Path(input_file_or_dir)
+    output_dir = Path(output_dir)
     weights_dir = download_weights()
     models = load_models(weights_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
