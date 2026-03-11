@@ -7,7 +7,7 @@ name = "vpshunt-detector"
 version = "0.1.3"
 description = "Detect VPShunt valves in X-ray images."
 readme = "README.md"
-license-files = [ "LICENSE" ]
+license = "Apache-2.0"
 authors = [
   { name = "Jannis Straus", email = "jannis.straus@uk-essen.de" },
 ]
