@@ -126,7 +126,7 @@ pytz==2025.2
     # via pandas
 pyyaml==6.0.3
     # via ultralytics
-requests==2.32.5
+requests==2.33.0
     # via
     #   ultralytics
     #   vpshunt-detector
