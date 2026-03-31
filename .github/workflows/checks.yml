@@ -10,10 +10,10 @@ jobs:
   test:
     runs-on: [self-hosted, macOS, ARM64]
     env:
-      AGENT_TOOLSDIRECTORY: ${{ runner.workspace }}/_tool
+      AGENT_TOOLSDIRECTORY: ${{ github.workspace }}/../_tool
       CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
       DEVICE: ${{ secrets.DEVICE }}
-      RUNNER_TOOL_CACHE: ${{ runner.workspace }}/_tool
+      RUNNER_TOOL_CACHE: ${{ github.workspace }}/../_tool
 
     strategy:
       fail-fast: false
