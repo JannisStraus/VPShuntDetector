@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def load_models(weights_dir: Path, n_folds: int = 5) -> tuple[YOLO, ...]:
-    logger.info(f"Loading {n_folds} folds from `{weights_dir}`.")
+    logger.info("Loading %s folds from '%s'.", n_folds, weights_dir)
     return tuple(
         YOLO(weights_dir / f"fold_{i}" / "best.pt", verbose=True)
         for i in range(n_folds)
@@ -51,8 +51,6 @@ def measure_results(
                 pred_cls = model.names[tmp_cls]
                 pred_conf = tmp_conf
                 pred_bbox = tuple(tmp_bbox[:4])
-            else:
-                print(image_path)
         confidence_accumulator[pred_cls] += pred_conf
         result_dict[f"prediction_fold_{i}"] = pred_cls
         result_dict[f"confidence_fold_{i}"] = pred_conf

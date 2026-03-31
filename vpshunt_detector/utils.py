@@ -77,6 +77,9 @@ def draw_bbox(
     elif cls not in missing_instructions:
         missing_instructions.add(cls)
         logger.warning(
-            f"Manufacturer image '{cls}.png' or '{cls}.jpg' is missing in '{instruction_dir}'."
+            "Manufacturer image '%s.png' or '%s.jpg' is missing in '%s'.",
+            cls,
+            cls,
+            instruction_dir,
         )
     return img
