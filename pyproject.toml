@@ -38,7 +38,6 @@ dev = [
   "pytest>=9.0.2",
   "pytest-cov>=7",
   "python-dotenv>=1.2.1",
-  "torch<2.11",
 ]
 
 [tool.uv]
