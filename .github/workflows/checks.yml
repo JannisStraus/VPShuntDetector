@@ -32,6 +32,15 @@ jobs:
       - name: Install Python ${{ matrix.python-version }} via uv
         run: uv python install ${{ matrix.python-version }}
 
+      - name: Debug architecture
+        run: |
+          uname -m
+          arch
+          which python3
+          python3 -c "import platform; print(platform.machine(), platform.platform())"
+          which uv
+          file "$(which uv)"
+
       - name: Install dependencies
         run: uv sync --dev
 
