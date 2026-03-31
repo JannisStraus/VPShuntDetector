@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: [self-hosted, macOS, ARM64]
     env:
       CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
       DEVICE: ${{ secrets.DEVICE }}
@@ -27,22 +27,15 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: uv.lock
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
           python-version: ${{ matrix.python-version }}
-
-      - name: Install Python ${{ matrix.python-version }} via uv
-        run: uv python install ${{ matrix.python-version }}
-
-      - name: Debug architecture
-        run: |
-          uname -m
-          arch
-          which python3
-          python3 -c "import platform; print(platform.machine(), platform.platform())"
-          which uv
-          file "$(which uv)"
+          architecture: arm64
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --dev --python "$(which python)"
 
       - name: Run pre-commit
         env:
