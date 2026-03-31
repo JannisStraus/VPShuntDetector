@@ -51,6 +51,8 @@ def measure_results(
                 pred_cls = model.names[tmp_cls]
                 pred_conf = tmp_conf
                 pred_bbox = tuple(tmp_bbox[:4])
+            else:
+                print(image_path)
         confidence_accumulator[pred_cls] += pred_conf
         result_dict[f"prediction_fold_{i}"] = pred_cls
         result_dict[f"confidence_fold_{i}"] = pred_conf

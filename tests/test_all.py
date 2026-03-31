@@ -52,6 +52,13 @@ class Test(unittest.TestCase):
         self.assertEqual(len(df), 1)
         shutil.rmtree(test_output_dir)
 
+        # Test inference with single image
+        infer(next(test_input_dir.glob("*.jpg")), test_output_dir, device=test_device)
+        self.assertTrue(test_results_file.is_file())
+        df = pd.read_csv(test_results_file)
+        self.assertEqual(len(df), 1)
+        shutil.rmtree(test_output_dir)
+
         # Test inference without instructions
         infer(test_input_dir, test_output_dir, device=test_device)
         self.assertTrue(test_results_file.is_file())
