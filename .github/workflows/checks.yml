@@ -10,10 +10,8 @@ jobs:
   test:
     runs-on: [self-hosted, macOS, ARM64]
     env:
-      AGENT_TOOLSDIRECTORY: ${{ github.workspace }}/../_tool
       CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
       DEVICE: ${{ secrets.DEVICE }}
-      RUNNER_TOOL_CACHE: ${{ github.workspace }}/../_tool
 
     strategy:
       fail-fast: false
@@ -24,20 +22,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Prepare tool cache
-        run: mkdir -p "$RUNNER_TOOL_CACHE"
-
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
           cache-dependency-glob: uv.lock
-
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-          architecture: arm64
 
       - name: Install dependencies
         run: uv sync --dev --python "$(which python)"
