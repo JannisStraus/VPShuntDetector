@@ -32,13 +32,14 @@ jobs:
           cache-dependency-glob: uv.lock
 
       - name: Set up Python ${{ matrix.python-version }}
+        id: setup-python
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           architecture: arm64
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --dev --python "${{ steps.setup-python.outputs.python-path }}"
 
       - name: Export requirements.txt
         run: |
@@ -53,7 +54,7 @@ jobs:
       - name: Run pre-commit
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: uv run pre-commit run -a --show-diff-on-failure
+        run: uv run --python "${{ steps.setup-python.outputs.python-path }}" pre-commit run -a --show-diff-on-failure
 
       - name: Run pytest with coverage
         run: uv run pytest
@@ -62,8 +63,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          uv run vpshuntdetector -h
-          uv run vpshuntdetector -v
+          uv run --python "${{ steps.setup-python.outputs.python-path }}" vpshuntdetector -h
+          uv run --python "${{ steps.setup-python.outputs.python-path }}" vpshuntdetector -v
 
       - name: Commit updated requirements.txt
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
