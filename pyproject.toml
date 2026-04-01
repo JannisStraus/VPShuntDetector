@@ -28,7 +28,7 @@ dependencies = [
   "pandas>=2.2.3,<3",
   "requests>=2.32.3,<3",
   "tqdm>=4.67.1,<5",
-  "ultralytics>=8.3.235,<8.4",
+  "ultralytics>=8.3.235,<8.5",
 ]
 scripts.vpshuntdetector = "vpshunt_detector.main:main"
 
