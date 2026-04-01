@@ -2,15 +2,19 @@ version: 2
 updates:
   - package-ecosystem: "uv"
     directory: "/"
+    versioning-strategy: lockfile-only
     schedule:
       interval: "monthly"
+    groups:
+      python-deps:
+        patterns:
+          - "*"
+
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
-
-    # optional but nice: group everything into a single PR
     groups:
-      python-deps:
+      github-actions:
         patterns:
           - "*"
