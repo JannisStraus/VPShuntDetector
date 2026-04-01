@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: [self-hosted, macOS, ARM64]
@@ -28,13 +31,30 @@ jobs:
           enable-cache: true
           cache-dependency-glob: uv.lock
 
+      - name: Set up Python ${{ matrix.python-version }}
+        id: setup-python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: arm64
+
       - name: Install dependencies
-        run: uv sync --dev --python "$(which python)"
+        run: uv sync --dev --python "${{ steps.setup-python.outputs.python-path }}"
+
+      - name: Export requirements.txt
+        run: |
+          uv export \
+            --format requirements.txt \
+            --locked \
+            --no-emit-local \
+            --no-all-extras \
+            --no-hashes \
+            --output-file requirements.txt
 
       - name: Run pre-commit
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: uv run pre-commit run -a --show-diff-on-failure
+        run: uv run --python "${{ steps.setup-python.outputs.python-path }}" pre-commit run -a --show-diff-on-failure
 
       - name: Run pytest with coverage
         run: uv run pytest
@@ -43,8 +63,24 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          uv run vpshuntdetector -h
-          uv run vpshuntdetector -v
+          uv run --python "${{ steps.setup-python.outputs.python-path }}" vpshuntdetector -h
+          uv run --python "${{ steps.setup-python.outputs.python-path }}" vpshuntdetector -v
+
+      - name: Commit updated requirements.txt
+        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- requirements.txt; then
+            echo "requirements.txt is up to date"
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add requirements.txt
+          git commit -m "chore: update requirements.txt"
+          git push origin "HEAD:${GITHUB_REF#refs/heads/}"
 
       - name: Send coverage results
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
