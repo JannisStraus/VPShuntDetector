@@ -136,7 +136,7 @@ scipy==1.15.3 ; python_full_version < '3.11'
     # via ultralytics
 scipy==1.17.1 ; python_full_version >= '3.11'
     # via ultralytics
-setuptools==81.0.0
+setuptools==82.0.1
     # via torch
 six==1.17.0
     # via python-dateutil
