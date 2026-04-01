@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 @lru_cache(maxsize=1)
 def load_models(weights_dir: Path, n_folds: int = 5) -> tuple[YOLO, ...]:
-    logger.info(f"Loading {n_folds} folds from `{weights_dir}`.")
+    logger.info("Loading %s folds from '%s'.", n_folds, weights_dir)
     return tuple(
         YOLO(weights_dir / f"fold_{i}" / "best.pt", verbose=True)
         for i in range(n_folds)

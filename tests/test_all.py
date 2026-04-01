@@ -39,9 +39,18 @@ class Test(unittest.TestCase):
         test_output_dir = test_data_dir / "output"
         test_results_file = test_output_dir / "results.csv"
         test_token = os.environ["CLOUD_TEST_TOKEN"]
+        test_url = f"https://cloud.uk-essen.de/d/{test_token}/files/"
         test_device = os.getenv("DEVICE", "cpu")
+        test_params = {"p": "/examples.zip", "dl": "1"}
 
-        test_data_dir = download_and_unzip(test_token, test_data_dir)
+        test_data_dir = download_and_unzip(test_data_dir, test_url, test_params)
+
+        # Test inference with single image
+        infer(next(test_input_dir.glob("*.jpg")), test_output_dir, device=test_device)
+        self.assertTrue(test_results_file.is_file())
+        df = pd.read_csv(test_results_file)
+        self.assertEqual(len(df), 1)
+        shutil.rmtree(test_output_dir)
 
         # Test inference with single image
         infer(next(test_input_dir.glob("*.jpg")), test_output_dir, device=test_device)

@@ -18,10 +18,10 @@ def unzip(zip_file: str | Path, output_dir: str | Path) -> None:
         zip_ref.extractall(output_dir)
 
 
-def download(token: str, zip_file: str | Path) -> None:
+def download(
+    zip_file: str | Path, url: str, params: dict[str, str] | None = None
+) -> None:
     zip_file = Path(zip_file)
-    url = f"https://cloud.uk-essen.de/d/{token}/files/"
-    params = {"p": f"/{zip_file.name}", "dl": "1"}
     response = requests.get(url, params=params, stream=True, timeout=20.0)
     response.raise_for_status()
     total_size = int(response.headers.get("content-length", 0))
@@ -38,17 +38,23 @@ def download(token: str, zip_file: str | Path) -> None:
                 progress_bar.update(len(chunk))
 
 
-def download_and_unzip(token: str, dst_dir: Path) -> Path:
+def download_and_unzip(
+    dst_dir: Path, url: str, params: dict[str, str] | None = None
+) -> Path:
     dst_dir.mkdir(parents=True, exist_ok=True)
-    zip_file = Path(dst_dir) / f"{dst_dir.name}.zip"
-    download(token, zip_file)
-    unzip(zip_file, dst_dir)
+    zip_file = dst_dir.with_suffix(".zip")
+    download(zip_file, url, params)
+    unzip(zip_file, dst_dir.parent)
     zip_file.unlink()
     return dst_dir
 
 
 def download_weights() -> Path:
     weights_dir = get_cache_dir() / "VPShuntDetector" / "weights"
+    weights_url = (
+        "https://github.com/JannisStraus/VPShuntDetector"
+        "/releases/download/v0.1.3/weights.zip"
+    )
     if not weights_exist(weights_dir):
-        download_and_unzip("63eb0592c4d94c6bafc9", weights_dir)
+        download_and_unzip(weights_dir, weights_url)
     return weights_dir

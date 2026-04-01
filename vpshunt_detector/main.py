@@ -1,5 +1,6 @@
 import argparse
 import logging
+from importlib.metadata import version
 from pathlib import Path
 
 from vpshunt_detector.inference import infer
@@ -12,16 +13,15 @@ def _existing(path_str: str) -> Path:
     return path
 
 
-def _existing_dir(path_str: str) -> Path:
-    path = Path(path_str).expanduser().resolve()
-    if not path.is_dir():
-        raise argparse.ArgumentTypeError(f"'{path}' is not an existing directory")
-    return path
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="Detect VPShunt valves in X-ray images."
+    )
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"%(prog)s {version('vpshunt-detector')}",
     )
     parser.add_argument(
         "-i", "--input", type=_existing, required=True, help="Path to input images."
@@ -35,7 +35,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--instructions",
-        type=_existing_dir,
+        type=_existing,
         required=False,
         help="Directory with instruction images for valve models.",
     )

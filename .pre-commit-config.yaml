@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.2
+    rev: v0.15.7
     hooks:
       - id: ruff-check
         args: [--fix]
@@ -21,7 +21,7 @@ repos:
         exclude: node_modules
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: v2.16.1
+    rev: v2.20.0
     hooks:
       - id: pyproject-fmt
         types: [toml]
@@ -33,7 +33,7 @@ repos:
         args: [--fix]
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
+    rev: v2.4.2
     hooks:
       - id: codespell
         types: [markdown]

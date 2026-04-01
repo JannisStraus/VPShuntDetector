@@ -2,16 +2,17 @@ name: Checks
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   pull_request:
-    branches: ["main"]
+    branches: [main]
 
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: [self-hosted, macOS, ARM64]
     env:
       CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
       DEVICE: ${{ secrets.DEVICE }}
+
     strategy:
       fail-fast: false
       matrix:
@@ -25,13 +26,10 @@ jobs:
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
-          cache-dependency-glob: "uv.lock"
-
-      - name: Install Python ${{ matrix.python-version }} via uv
-        run: uv python install ${{ matrix.python-version }}
+          cache-dependency-glob: uv.lock
 
       - name: Install dependencies
-        run: uv sync -q --dev
+        run: uv sync --dev --python "$(which python)"
 
       - name: Run pre-commit
         env:
@@ -45,24 +43,12 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-
-          TMP_DIR="$(mktemp -d)"
-          ZIP_PATH="$TMP_DIR/examples.zip"
-
-          curl -fsSL "https://cloud.uk-essen.de/d/${CLOUD_TEST_TOKEN}/files/?p=/examples.zip&dl=1" -o "$ZIP_PATH"
-          unzip -q "$ZIP_PATH" -d "$TMP_DIR"
-
-          uv run vpshuntdetector \
-          -i "$TMP_DIR/input" \
-          -o "$TMP_DIR/output" \
-          --instructions "$TMP_DIR/manufacturer" \
-          -d "${DEVICE:-cpu}"
-
-          rm -rf "$TMP_DIR"
+          uv run vpshuntdetector -h
+          uv run vpshuntdetector -v
 
       - name: Send coverage results
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # v5.5.2
+        uses: codecov/codecov-action@v6
         with:
           files: coverage.xml
           token: ${{ secrets.CODECOV_TOKEN }}
