@@ -1,5 +1,7 @@
+import sys
 import zipfile
 from pathlib import Path
+from typing import Any
 
 import requests
 from tqdm import tqdm
@@ -14,7 +16,11 @@ def weights_exist(weights_dir: str | Path) -> bool:
 
 def unzip(zip_file: str | Path, output_dir: str | Path) -> None:
     zip_file = Path(zip_file)
-    with zipfile.ZipFile(zip_file, "r", metadata_encoding="utf-8") as zip_ref:
+    zipfile_kwargs: dict[str, Any] = {}
+    # TODO(py310): Remove once Python 3.10 support is dropped
+    if sys.version_info >= (3, 11):
+        zipfile_kwargs["metadata_encoding"] = "utf-8"
+    with zipfile.ZipFile(zip_file, "r", **zipfile_kwargs) as zip_ref:
         zip_ref.extractall(output_dir)
 
 
