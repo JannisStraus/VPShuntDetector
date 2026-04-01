@@ -12,6 +12,9 @@ permissions:
 jobs:
   test:
     runs-on: [self-hosted, macOS, ARM64]
+    defaults:
+          run:
+            shell: arch -arm64 /bin/bash --noprofile --norc -eo pipefail {0}
     env:
       CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
       DEVICE: ${{ secrets.DEVICE }}
@@ -46,6 +49,7 @@ jobs:
             --output-file requirements.txt
 
       - name: Run pre-commit
+        shell: arch -arm64 /bin/bash --noprofile --norc -eo pipefail {0}
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
         run: uv run pre-commit run -a --show-diff-on-failure
@@ -54,7 +58,6 @@ jobs:
         run: uv run pytest
 
       - name: CLI smoke test
-        shell: bash
         run: |
           set -euo pipefail
           uv run vpshuntdetector -h
