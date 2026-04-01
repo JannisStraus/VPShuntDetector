@@ -97,7 +97,7 @@ nvidia-nvjitlink==13.0.88 ; sys_platform == 'linux'
     #   nvidia-cusparse
 nvidia-nvshmem-cu13==3.4.5 ; sys_platform == 'linux'
     # via torch
-nvidia-nvtx==13.0.85 ; sys_platform == 'linux'
+nvidia-nvtx==13.2.20 ; sys_platform == 'linux'
     # via cuda-toolkit
 opencv-python==4.11.0.86
     # via
