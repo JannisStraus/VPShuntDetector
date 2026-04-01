@@ -112,7 +112,7 @@ pillow==12.1.1
     #   ultralytics
 polars==1.38.1
     # via ultralytics
-polars-runtime-32==1.38.1
+polars-runtime-32==1.39.3
     # via polars
 psutil==7.2.2
     # via ultralytics
