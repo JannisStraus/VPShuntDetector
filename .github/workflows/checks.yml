@@ -38,7 +38,7 @@ jobs:
           architecture: arm64
 
       - name: Install dependencies
-        run: uv sync --dev
+        run: uv sync --dev --python "${{ matrix.python-version }}"
 
       - name: Export requirements.txt
         run: |
@@ -53,17 +53,17 @@ jobs:
       - name: Run pre-commit
         env:
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: uv run pre-commit run -a --show-diff-on-failure
+        run: uv run --python "${{ matrix.python-version }}" pre-commit run -a --show-diff-on-failure
 
       - name: Run pytest with coverage
-        run: uv run pytest
+        run: uv run --python "${{ matrix.python-version }}" pytest
 
       - name: CLI smoke test
         shell: bash
         run: |
           set -euo pipefail
-          uv run vpshuntdetector -h
-          uv run vpshuntdetector -v
+          uv run --python "${{ matrix.python-version }}" vpshuntdetector -h
+          uv run --python "${{ matrix.python-version }}" vpshuntdetector -v
 
       - name: Commit updated requirements.txt
         if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
