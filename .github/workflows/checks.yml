@@ -69,6 +69,13 @@ jobs:
           uv run vpshuntdetector -h
           uv run vpshuntdetector -v
 
+      - name: Cache pre-commit environments
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('.pre-commit-config.yaml') }}
+
       - name: Run pre-commit
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
         env:
