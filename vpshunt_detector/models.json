@@ -1,0 +1,10 @@
+{
+  "default": "v0.1.3",
+  "releases": {
+    "v0.1.3": {
+      "url": "https://github.com/JannisStraus/VPShuntDetector/releases/download/v0.1.3/weights.zip",
+      "sha256": "7e4967a7d53281d05b4e883dc229d0975368ad4b5ec1ae2ef05bbc90a84cf5e7",
+      "n_folds": 5
+    }
+  }
+}

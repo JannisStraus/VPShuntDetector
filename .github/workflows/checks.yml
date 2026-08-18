@@ -7,19 +7,36 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   test:
-    runs-on: [self-hosted, macOS, ARM64]
+    name: ${{ matrix.os }} / python${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      # Needed by the requirements.txt commit step below.
+      contents: write
     env:
-      CLOUD_TEST_TOKEN: ${{ secrets.CLOUD_TEST_TOKEN }}
-      DEVICE: ${{ secrets.DEVICE }}
+      # Every uv call picks this up, so no --python flag is needed anywhere.
+      UV_PYTHON: ${{ matrix.python-version }}
 
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.11"
+          - os: macos-latest
+            python-version: "3.12"
+          - os: windows-latest
+            python-version: "3.13"
+          - os: ubuntu-latest
+            python-version: "3.14"
 
     steps:
       - name: Check out repository
@@ -28,33 +45,19 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          enable-cache: true
+          # Narrower than the default glob, which also watches requirements.txt
+          # and would be invalidated by this workflow's own commits.
           cache-dependency-glob: uv.lock
 
-      - name: Set up Python ${{ matrix.python-version }}
-        id: setup-python
-        uses: actions/setup-python@v6
+      - name: Cache model weights and test images
+        uses: actions/cache@v6
         with:
-          python-version: ${{ matrix.python-version }}
-          architecture: arm64
+          # weights.zip is ~630 MB; without this every run re-downloads it.
+          path: ~/.cache/VPShuntDetector
+          key: vpshunt-data-${{ runner.os }}-${{ hashFiles('vpshunt_detector/models.json') }}
 
       - name: Install dependencies
-        run: uv sync --dev --python "${{ steps.setup-python.outputs.python-path }}"
-
-      - name: Export requirements.txt
-        run: |
-          uv export \
-            --format requirements.txt \
-            --locked \
-            --no-emit-local \
-            --no-all-extras \
-            --no-hashes \
-            --output-file requirements.txt
-
-      - name: Run pre-commit
-        env:
-          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
-        run: uv run --python "${{ steps.setup-python.outputs.python-path }}" pre-commit run -a --show-diff-on-failure
+        run: uv sync --dev
 
       - name: Run pytest with coverage
         run: uv run pytest
@@ -63,12 +66,27 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          uv run --python "${{ steps.setup-python.outputs.python-path }}" vpshuntdetector -h
-          uv run --python "${{ steps.setup-python.outputs.python-path }}" vpshuntdetector -v
+          uv run vpshuntdetector -h
+          uv run vpshuntdetector -v
+
+      - name: Run pre-commit
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
+        run: uv run pre-commit run -a --show-diff-on-failure
+
+      - name: Export requirements.txt
+        if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
+        run: |
+          uv export \
+            --format requirements.txt \
+            --locked \
+            --no-emit-local \
+            --no-hashes \
+            --output-file requirements.txt
 
       - name: Commit updated requirements.txt
-        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
-        shell: bash
+        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
         run: |
           set -euo pipefail
           if git diff --quiet -- requirements.txt; then
@@ -80,10 +98,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add requirements.txt
           git commit -m "chore: update requirements.txt"
-          git push origin "HEAD:${GITHUB_REF#refs/heads/}"
+          git push origin HEAD:main
 
       - name: Send coverage results
-        if: success() && github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.python-version == '3.13'
+        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.14'
         uses: codecov/codecov-action@v7
         with:
           files: coverage.xml

@@ -8,7 +8,7 @@ from vpshunt_detector.inference import infer
 
 def _existing(path_str: str) -> Path:
     path = Path(path_str).expanduser().resolve()
-    if not path.exists():
+    if not path.is_dir():
         raise argparse.ArgumentTypeError(f"'{path}' is not an existing directory")
     return path
 
