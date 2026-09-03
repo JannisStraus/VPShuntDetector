@@ -62,7 +62,8 @@ vpshuntdetector -i <input> -o <output> --instructions <instructions_directory>
 - `--instructions`: _(Optional)_ Directory with instruction images for valve
 models.
 - `-d`, `--device`: _(Optional)_ Device to perform inference on (e.g. `cuda` or
-`cpu`).
+`cpu`). Auto-detected by default.
+- `--verbose`: _(Optional)_ Log detailed progress information.
 
 ## Instruction Images
 

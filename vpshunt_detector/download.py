@@ -39,7 +39,7 @@ def load_registry() -> tuple[str, dict[str, ModelRelease]]:
         )
         for name, spec in raw["releases"].items()
     }
-    return raw["default"], releases
+    return raw["latest"], releases
 
 
 def resolve_release(release: str | None = None) -> ModelRelease:
