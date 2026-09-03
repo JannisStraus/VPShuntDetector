@@ -8,9 +8,28 @@ from vpshunt_detector.inference import infer
 
 def _existing(path_str: str) -> Path:
     path = Path(path_str).expanduser().resolve()
-    if not path.is_dir():
+    if not path.exists():
         raise argparse.ArgumentTypeError(f"'{path}' is not an existing directory")
     return path
+
+
+def _target(path_str: str) -> Path:
+    return Path(path_str).expanduser().resolve()
+
+
+def _setup_logging(verbose: bool) -> None:
+    handler = logging.StreamHandler()
+    handler.setFormatter(
+        logging.Formatter(
+            fmt="%(asctime)s | %(levelname)-8s | %(message)s",
+            datefmt="%Y-%m-%d %H:%M:%S",
+        )
+    )
+    package_logger = logging.getLogger("vpshunt_detector")
+    package_logger.handlers.clear()
+    package_logger.addHandler(handler)
+    package_logger.setLevel(logging.INFO if verbose else logging.WARNING)
+    package_logger.propagate = False
 
 
 def main() -> None:
@@ -29,7 +48,7 @@ def main() -> None:
     parser.add_argument(
         "-o",
         "--output",
-        type=Path,
+        type=_target,
         required=True,
         help="Path to save detection results.",
     )
@@ -43,9 +62,18 @@ def main() -> None:
         "-d",
         "--device",
         required=False,
-        help="Device for inference (e.g. 'cuda' or 'gpu').",
+        help="Device for inference (e.g. 'cuda' or 'cpu'). Default: auto-detect.",
+    )
+    parser.add_argument(
+        "--verbose",
+        required=False,
+        action="store_true",
+        default=False,
+        help="Log detailed informations.",
     )
     args = parser.parse_args()
+
+    _setup_logging(args.verbose)
 
     infer(
         args.input,
@@ -56,5 +84,4 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
     main()

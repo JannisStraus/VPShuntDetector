@@ -1,4 +1,5 @@
 import argparse
+import csv
 import hashlib
 import http.server
 import io
@@ -18,7 +19,6 @@ from unittest import mock
 import cv2
 import numpy as np
 import numpy.testing as npt
-import pandas as pd
 from requests.exceptions import ChunkedEncodingError
 
 from vpshunt_detector.download import (
@@ -31,7 +31,7 @@ from vpshunt_detector.download import (
     unzip,
     weights_exist,
 )
-from vpshunt_detector.inference import ALLOWED_FORMAT, infer, measure_results
+from vpshunt_detector.inference import ALLOWED_FORMAT, ImageResult, evaluate, infer
 from vpshunt_detector.main import _existing, main
 from vpshunt_detector.utils import draw_bbox, get_cache_dir, save_bbox
 
@@ -139,27 +139,29 @@ def no_detection() -> FakeResult:
     return FakeResult([], [], [])
 
 
-def run_folds(models: list[FakeModel]) -> tuple[dict[str, str | float], Any]:
-    """Run measure_results against stand-in models."""
-    return measure_results(cast(Any, tuple(models)), "image.png")
+def run_folds(models: list[FakeModel]) -> tuple[ImageResult, Any]:
+    """Run evaluate against stand-in models."""
+    return evaluate(cast(Any, tuple(models)), "image.png")
 
 
-class TestMeasureResults(unittest.TestCase):
+class TestEvaluate(unittest.TestCase):
     """Ensemble aggregation, exercised offline through FakeModel."""
 
     def test_unanimous(self) -> None:
         result, bbox = run_folds([FakeModel([detection(1, 0.8)]) for _ in range(5)])
-        self.assertEqual(result["prediction"], "Codman Hakim")
-        self.assertAlmostEqual(float(result["confidence"]), 0.8, places=5)
+        self.assertEqual(result.image_name, "image.png")
+        self.assertEqual(result.prediction, "Codman Hakim")
+        self.assertAlmostEqual(result.confidence, 0.8, places=5)
         self.assertEqual(bbox, (10, 20, 30, 40))
-        for i in range(5):
-            self.assertEqual(result[f"prediction_fold_{i}"], "Codman Hakim")
-            self.assertAlmostEqual(float(result[f"confidence_fold_{i}"]), 0.8)
+        self.assertEqual(len(result.folds), 5)
+        for fold in result.folds:
+            self.assertEqual(fold.prediction, "Codman Hakim")
+            self.assertAlmostEqual(fold.confidence, 0.8)
 
     def test_all_abstain(self) -> None:
         result, bbox = run_folds([FakeModel([no_detection()]) for _ in range(5)])
-        self.assertEqual(result["prediction"], "Nothing")
-        self.assertEqual(float(result["confidence"]), 0.0)
+        self.assertEqual(result.prediction, "Nothing")
+        self.assertEqual(result.confidence, 0.0)
         self.assertIsNone(bbox)
 
     def test_single_fold_decides(self) -> None:
@@ -171,8 +173,8 @@ class TestMeasureResults(unittest.TestCase):
         models = [FakeModel([no_detection()]) for _ in range(4)]
         models.append(FakeModel([detection(0, 0.30)]))
         result, bbox = run_folds(models)
-        self.assertEqual(result["prediction"], "Codman Certas")
-        self.assertAlmostEqual(float(result["confidence"]), 0.06, places=5)
+        self.assertEqual(result.prediction, "Codman Certas")
+        self.assertAlmostEqual(result.confidence, 0.06, places=5)
         self.assertIsNotNone(bbox)
 
     def test_best_bbox_wins(self) -> None:
@@ -187,12 +189,12 @@ class TestMeasureResults(unittest.TestCase):
     def test_lower_conf_ignored(self) -> None:
         """Covers the branch taken when a later result does not beat the best."""
         result, bbox = run_folds([FakeModel([detection(1, 0.9), detection(0, 0.2)])])
-        self.assertEqual(result["prediction"], "Codman Hakim")
+        self.assertEqual(result.prediction, "Codman Hakim")
         self.assertEqual(bbox, (10, 20, 30, 40))
 
     def test_empty_result_skipped(self) -> None:
         result, _ = run_folds([FakeModel([no_detection(), detection(3, 0.55)])])
-        self.assertEqual(result["prediction"], "paediGAV")
+        self.assertEqual(result.prediction, "paediGAV")
 
 
 class TestDrawBBox(unittest.TestCase):
@@ -451,6 +453,17 @@ class TestRegistry(unittest.TestCase):
 
 
 class TestCli(unittest.TestCase):
+    def setUp(self) -> None:
+        logger = logging.getLogger("vpshunt_detector")
+        handlers, level, propagate = logger.handlers[:], logger.level, logger.propagate
+
+        def restore() -> None:
+            logger.handlers[:] = handlers
+            logger.setLevel(level)
+            logger.propagate = propagate
+
+        self.addCleanup(restore)
+
     def test_existing_path(self) -> None:
         self.assertEqual(_existing(str(TESTS_DIR)), TESTS_DIR.resolve())
 
@@ -490,21 +503,27 @@ class TestCli(unittest.TestCase):
         self.assertEqual(ctx.exception.code, 0)
 
     def test_module_entry(self) -> None:
-        """`python -m vpshunt_detector.main` takes the __main__ branch.
-
-        Note this is the only entry point that calls logging.basicConfig; the
-        installed `vpshuntdetector` console script calls main() directly.
-        """
-        with (
-            mock.patch.object(sys, "argv", ["vpshuntdetector", "--version"]),
-            mock.patch("logging.basicConfig") as basic_config,
-            warnings.catch_warnings(),
-            self.assertRaises(SystemExit),
-        ):
-            # runpy re-executes an already-imported module; that is the point.
-            warnings.simplefilter("ignore", RuntimeWarning)
-            runpy.run_module("vpshunt_detector.main", run_name="__main__")
-        basic_config.assert_called_once()
+        """`python -m vpshunt_detector.main` takes the __main__ branch."""
+        with TemporaryDirectory() as tmp:
+            argv = [
+                "vpshuntdetector",
+                "-i",
+                str(TESTS_DIR),
+                "-o",
+                str(Path(tmp) / "out"),
+                "--verbose",
+            ]
+            with (
+                mock.patch.object(sys, "argv", argv),
+                mock.patch("vpshunt_detector.inference.infer") as infer_mock,
+                warnings.catch_warnings(),
+            ):
+                warnings.simplefilter("ignore", RuntimeWarning)
+                runpy.run_module("vpshunt_detector.main", run_name="__main__")
+        infer_mock.assert_called_once()
+        logger = logging.getLogger("vpshunt_detector")
+        self.assertEqual(logger.level, logging.INFO)
+        self.assertEqual(len(logger.handlers), 1)
 
 
 class TestInference(unittest.TestCase):
@@ -527,10 +546,11 @@ class TestInference(unittest.TestCase):
     def tearDown(self) -> None:
         self._tmp.cleanup()
 
-    def read_results(self) -> pd.DataFrame:
+    def read_results(self) -> list[dict[str, Any]]:
         results_file = self.output_dir / "results.csv"
         self.assertTrue(results_file.is_file())
-        return pd.read_csv(results_file)
+        with results_file.open("r", newline="", encoding="utf-8") as handle:
+            return list(csv.DictReader(handle))
 
     def test_fixtures(self) -> None:
         self.assertEqual(len(self.images), len(TEST_IMAGES))
@@ -540,15 +560,15 @@ class TestInference(unittest.TestCase):
 
     def test_single_image(self) -> None:
         infer(self.images[0], self.output_dir, device="cpu")
-        frame = self.read_results()
-        self.assertEqual(len(frame), 1)
-        self.assertEqual(frame["image_name"][0], self.images[0].name)
+        results = self.read_results()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["image_name"], self.images[0].name)
         self.assertTrue((self.output_dir / self.images[0].name).is_file())
 
     def test_directory(self) -> None:
         infer(self.input_dir, self.output_dir, device="cpu")
-        frame = self.read_results()
-        self.assertEqual(len(frame), len(self.images))
+        results = self.read_results()
+        self.assertEqual(len(results), len(self.images))
         for image in self.images:
             self.assertTrue((self.output_dir / image.name).is_file())
 
@@ -562,10 +582,22 @@ class TestInference(unittest.TestCase):
         infer(mixed, self.output_dir, device="cpu")
         self.assertEqual(len(self.read_results()), len(self.images))
 
+    def test_no_images(self) -> None:
+        empty = self.tmp_dir / "empty"
+        empty.mkdir()
+        with self.assertLogs("vpshunt_detector.inference", level="WARNING") as logs:
+            infer(empty, self.output_dir, device="cpu")
+        self.assertIn(str(empty), logs.output[0])
+        # The report is still written, so downstream readers see the columns.
+        self.assertEqual(self.read_results(), [])
+        with (self.output_dir / "results.csv").open(encoding="utf-8") as handle:
+            header = handle.readline().rstrip("\n").split(",")
+        self.assertEqual(header, ImageResult.fieldnames(resolve_release().n_folds))
+
     def test_with_instructions(self) -> None:
         infer(self.input_dir, self.output_dir, self.instructions, "cpu")
-        frame = self.read_results()
-        self.assertEqual(len(frame), len(self.images))
+        results = self.read_results()
+        self.assertEqual(len(results), len(self.images))
         for image in self.images:
             annotated = cv2.imread(str(self.output_dir / image.name))
             original = cv2.imread(str(image))
@@ -574,9 +606,9 @@ class TestInference(unittest.TestCase):
     def test_missing_instruction(self) -> None:
         infer(self.input_dir, self.output_dir, self.instructions, "cpu")
         predicted = {
-            str(value)
-            for value in self.read_results()["prediction"]
-            if str(value) != "Nothing"
+            row["prediction"]
+            for row in self.read_results()
+            if row["prediction"] != "Nothing"
         }
         if not predicted:
             self.skipTest("no valve detected, nothing to look up an instruction for")
