@@ -41,6 +41,7 @@ numpy==2.4.6 ; python_full_version < '3.12'
     #   contourpy
     #   matplotlib
     #   opencv-python
+    #   pandas
     #   scipy
     #   torchvision
     #   ultralytics
@@ -96,15 +97,23 @@ nvidia-nvshmem-cu13==3.4.5 ; sys_platform == 'linux'
 nvidia-nvtx==13.0.85 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
     # via cuda-toolkit
 opencv-python==4.11.0.86
-    # via ultralytics
+    # via
+    #   contourpy
+    #   matplotlib
+    #   opencv-python
+    #   scipy
+    #   torchvision
+    #   ultralytics
+    #   vpshunt-detector
 packaging==26.3
     # via matplotlib
+pandas==2.3.3
+    # via vpshunt-detector
 pillow==12.3.0
     # via
     #   matplotlib
     #   torchvision
     #   ultralytics
-    #   vpshunt-detector
 polars==1.43.2
     # via ultralytics
 polars-runtime-32==1.43.2
@@ -114,7 +123,11 @@ psutil==7.2.2
 pyparsing==3.3.2
     # via matplotlib
 python-dateutil==2.9.0.post0
-    # via matplotlib
+    # via
+    #   matplotlib
+    #   pandas
+pytz==2026.3.post1
+    # via pandas
 pyyaml==6.0.3
     # via ultralytics
 requests==2.34.2
@@ -145,6 +158,8 @@ triton==3.7.1 ; sys_platform == 'linux'
     # via torch
 typing-extensions==4.16.0
     # via torch
+tzdata==2026.3
+    # via pandas
 ultralytics==8.3.253
     # via vpshunt-detector
 ultralytics-thop==2.1.6
