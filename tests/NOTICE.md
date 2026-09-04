@@ -13,7 +13,9 @@ Valves Dataset**. No image is redistributed with this repository.
 | `certas_2.png` | `codman_certas_plus/certas_2.png` |
 
 Both are pinned by SHA-256 in `tests/test_all.py` and cached under
-`~/.cache/VPShuntDetector/test-images/`, so a run only downloads them once.
+the per-user cache directory reported by `get_cache_dir()`
+(`~/.cache/VPShuntDetector` on Linux, `~/Library/Caches/VPShuntDetector` on
+macOS), so a run only downloads them once.
 
 ## Citation
 

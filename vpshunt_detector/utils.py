@@ -4,15 +4,15 @@ from typing import Any
 
 import cv2
 from cv2.typing import MatLike
+from platformdirs import user_cache_path
 
 BBox = tuple[int, int, int, int] | None
 logger = logging.getLogger(__name__)
 
 
 def get_cache_dir() -> Path:
-    cache_dir = Path.home() / ".cache"
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    return cache_dir
+    """Return the per-user cache root for the current platform."""
+    return user_cache_path("VPShuntDetector", appauthor=False, ensure_exists=True)
 
 
 def save_bbox(

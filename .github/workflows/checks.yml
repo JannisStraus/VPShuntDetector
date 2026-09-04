@@ -45,19 +45,25 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
-          # Narrower than the default glob, which also watches requirements.txt
-          # and would be invalidated by this workflow's own commits.
           cache-dependency-glob: uv.lock
+
+      - name: Install dependencies
+        run: uv sync --dev
+
+      - name: Resolve the cache directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf 'VPSHUNT_CACHE=%s\n' \
+            "$(uv run python -c 'from vpshunt_detector.utils import get_cache_dir; print(get_cache_dir())')" \
+            >> "$GITHUB_ENV"
 
       - name: Cache model weights and test images
         uses: actions/cache@v6
         with:
           # weights.zip is ~630 MB; without this every run re-downloads it.
-          path: ~/.cache/VPShuntDetector
+          path: ${{ env.VPSHUNT_CACHE }}
           key: vpshunt-data-${{ runner.os }}-${{ hashFiles('vpshunt_detector/models.json') }}
-
-      - name: Install dependencies
-        run: uv sync --dev
 
       - name: Run pytest with coverage
         run: uv run pytest

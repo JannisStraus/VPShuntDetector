@@ -1816,7 +1816,8 @@ name = "vpshunt-detector"
 version = "0.1.6"
 source = { editable = "." }
 dependencies = [
-    { name = "pillow" },
+    { name = "opencv-python" },
+    { name = "platformdirs" },
     { name = "requests" },
     { name = "torch" },
     { name = "tqdm" },
@@ -1832,7 +1833,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "pillow", specifier = ">=12.3" },
+    { name = "opencv-python", specifier = ">=4.11.0.86" },
+    { name = "platformdirs", specifier = ">=4.11.3" },
     { name = "requests", specifier = ">=2.32.3,<3" },
     { name = "torch", specifier = ">=2,<3" },
     { name = "tqdm", specifier = ">=4.67.1,<5" },

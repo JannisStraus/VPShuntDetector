@@ -84,7 +84,7 @@ def fetch_test_images() -> Path:
         "https://raw.githubusercontent.com/CSFShuntvalves/xray_csf_shuntvalves"
         f"/{dataset_commit}"
     )
-    cache = get_cache_dir() / "VPShuntDetector" / "test-images" / dataset_commit
+    cache = get_cache_dir() / "test-images" / dataset_commit
     cache.mkdir(parents=True, exist_ok=True)
     for name, (source, sha256) in TEST_IMAGES.items():
         destination = cache / name

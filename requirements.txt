@@ -96,7 +96,9 @@ nvidia-nvshmem-cu13==3.4.5 ; sys_platform == 'linux'
 nvidia-nvtx==13.0.85 ; (platform_machine == 'aarch64' and sys_platform == 'linux') or (platform_machine == 'x86_64' and sys_platform == 'linux')
     # via cuda-toolkit
 opencv-python==4.11.0.86
-    # via ultralytics
+    # via
+    #   ultralytics
+    #   vpshunt-detector
 packaging==26.3
     # via matplotlib
 pillow==12.3.0
@@ -104,7 +106,8 @@ pillow==12.3.0
     #   matplotlib
     #   torchvision
     #   ultralytics
-    #   vpshunt-detector
+platformdirs==4.11.3
+    # via vpshunt-detector
 polars==1.43.2
     # via ultralytics
 polars-runtime-32==1.43.2

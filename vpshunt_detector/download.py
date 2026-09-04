@@ -123,7 +123,7 @@ def download_weights(release: str | None = None) -> Path:
     model = resolve_release(name)
     # Keyed by release so newly published weights are never shadowed by an
     # older download that happens to have the same fold layout.
-    weights_dir = get_cache_dir() / "VPShuntDetector" / name / "weights"
+    weights_dir = get_cache_dir() / name / "weights"
     if not weights_exist(weights_dir, model.n_folds):
         logger.info("Downloading weights release '%s'.", name)
         download_and_unzip(weights_dir, model.url, sha256=model.sha256)
